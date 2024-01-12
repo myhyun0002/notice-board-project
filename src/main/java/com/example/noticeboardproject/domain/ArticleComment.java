@@ -20,10 +20,10 @@ import static jakarta.persistence.FetchType.LAZY;
         @Index(columnList = "createdAt"),
         @Index(columnList = "modifiedAt"),
 })
-@EntityListeners(AuditingEntityListener.class)
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ArticleComment {
+public class ArticleComment extends AuditingFields{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,19 +32,6 @@ public class ArticleComment {
     private Article article; // 게시글(id)
     @Setter @Column(nullable = false,length = 500)
     private String content; // 본문
-
-    @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime createdAt; // 생성 일시
-    @CreatedBy
-    @Column(nullable = false,length = 100)
-    private String createdBy; // 생성자
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime modifiedAt; // 수정 일시
-    @LastModifiedBy
-    @Column(nullable = false,length = 100)
-    private String modifiedBy; // 수정자
 
     private ArticleComment(Article article, String content) {
         this.article = article;
