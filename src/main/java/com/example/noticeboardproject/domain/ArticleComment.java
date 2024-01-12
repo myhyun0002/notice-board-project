@@ -1,15 +1,70 @@
 package com.example.noticeboardproject.domain;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import static jakarta.persistence.FetchType.LAZY;
+
+@Getter
+@ToString
+@Table(indexes = {
+        @Index(columnList = "content"),
+        @Index(columnList = "createdAt"),
+        @Index(columnList = "modifiedAt"),
+})
+@EntityListeners(AuditingEntityListener.class)
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleComment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title; // 제목
+
+    @Setter @ManyToOne(optional = false,fetch = LAZY)
+    private Article article; // 게시글(id)
+    @Setter @Column(nullable = false,length = 500)
     private String content; // 본문
 
-    private LocalDateTime createdAt; // 생성일시
+    @CreatedDate
+    @Column(nullable = false)
+    private LocalDateTime createdAt; // 생성 일시
+    @CreatedBy
+    @Column(nullable = false,length = 100)
     private String createdBy; // 생성자
-    private LocalDateTime modifiedAt; // 수정일시
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime modifiedAt; // 수정 일시
+    @LastModifiedBy
+    @Column(nullable = false,length = 100)
     private String modifiedBy; // 수정자
 
+    private ArticleComment(Article article, String content) {
+        this.article = article;
+        this.content = content;
+    }
+
+    public static ArticleComment of(Article article, String content) {
+        return new ArticleComment(article,content);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArticleComment that = (ArticleComment) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }
